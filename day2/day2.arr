@@ -1,5 +1,29 @@
 use context starter2024
 
+
+fun report-safe(reports :: List<List<Number>>) -> Number:
+  doc: "consumes a list of reports and return the number of safe reports"
+  
+  fun helper(lst :: List<List<Number>>, acc :: Number):
+    cases (List) lst:
+      | empty => acc
+      | link(f, r) => 
+        if is-safe(f):
+          helper(r, acc + 1)
+        else:
+          helper(r, acc)
+        end
+    end
+  end
+  
+  helper(reports, 0)
+  
+where:
+  report-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]]) is 2
+  
+end
+
+
 fun is-safe(lst :: List<Number>) -> Boolean:
   doc: "process a list and determine if it is safe. A list is safe if  either all the numbers are increasing or decreasing and if two adjacent levels differe by at least one and at most three"
 
