@@ -1,5 +1,21 @@
 use context starter2024
 
+include file("sample-data.arr")
+
+fun process-file(file :: String)-> List<List<Number>>:
+  doc: "read file and process the content to produce a list of list of numbers"
+  string-split-all(file, "\n").map(lam(x): string-split-all(x, " ").map(lam(y): string-to-number(y).or-else(0) end) end)
+end
+
+
+check:
+  report-lists = process-file(sample-input)
+  
+  report-safe(report-lists) is 2
+end
+
+
+
 
 fun report-safe(reports :: List<List<Number>>) -> Number:
   doc: "consumes a list of reports and return the number of safe reports"
