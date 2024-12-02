@@ -10,14 +10,39 @@ end
 
 # check:
 #   report-lists = process-file(sample-input)
-  
+
 #   report-safe(report-lists) is 2
+#   report-tolerant-safe(report-lists) is 4
 # end
+
+
+fun report-tolerant-safe(reports-lst :: List<List<Number>>) -> Number:
+  doc: "consumes a list of lists and report the number of tolerant safe reports"
+
+  fun helper(lst-reports :: List<List<Number>>, acc :: Number):
+    cases (List) lst-reports:
+      | empty => acc
+      | link(f, r) => 
+        if is-tolerant-safe(f):
+          helper(r, acc + 1)
+        else:
+          helper(r, acc)
+        end
+    end
+  end
+
+  helper(reports-lst, 0)
+
+
+where:
+  report-tolerant-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]]) is 4
+
+end
 
 
 fun report-safe(reports :: List<List<Number>>) -> Number:
   doc: "consumes a list of reports and return the number of safe reports"
-  
+
   fun helper(lst :: List<List<Number>>, acc :: Number):
     cases (List) lst:
       | empty => acc
@@ -29,11 +54,43 @@ fun report-safe(reports :: List<List<Number>>) -> Number:
         end
     end
   end
-  
+
   helper(reports, 0)
-  
+
 where:
   report-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]]) is 2
+
+end
+
+
+fun is-tolerant-safe(lst :: List<Number>) -> Boolean:
+  doc: "process a list and determine if it is safe. This is a variant of is-safe and tolerate a single bad level"
+  
+  
+  fun helper(seen, n-lst):
+    cases (List) n-lst:
+      | empty => false
+      | link(f, r) =>
+        if is-safe(seen.append(r)):
+          true
+        else:
+          new-seen = seen.append([list: f])
+          helper(new-seen, r)
+        end
+    end
+  end
+
+
+  if is-safe(lst):
+    true
+  else:
+    helper(empty, lst)
+  end
+
+where:
+  is-tolerant-safe([list: 1, 3, 2, 4, 5]) is true
+  is-tolerant-safe([list: 8, 6, 4, 4, 1]) is true
+  is-tolerant-safe([list: 91, 91, 93, 93, 95, 96, 99]) is false
   
 end
 
@@ -67,6 +124,7 @@ where:
   is-safe([list: 1, 3, 2, 4, 5]) is false
   is-safe([list: 8, 6, 4, 4, 1]) is false
   is-safe([list: 1, 3, 6, 7, 9]) is true
+  is-safe([list: 91, 91, 93, 93, 95, 96, 99]) is false
 end
 
 
@@ -99,5 +157,4 @@ fun is-sorted(l :: List<Number>) -> Boolean:
   end
 
   all-increasing(l.rest, l.first) or  all-decreasing(l.rest, l.first)
-
 end
