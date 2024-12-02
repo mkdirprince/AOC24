@@ -1,6 +1,6 @@
 use context starter2024
 
-include file("puzzle-data.arr")
+include file("sample-data.arr")
 
 fun process-file(file :: String)-> List<List<Number>>:
   doc: "read file and process the content to produce a list of list of numbers"
@@ -8,65 +8,40 @@ fun process-file(file :: String)-> List<List<Number>>:
 end
 
 
-# check:
-#   report-lists = process-file(sample-input)
+check:
+  report-lists = process-file(sample-input)
 
-#   report-safe(report-lists) is 2
-#   report-tolerant-safe(report-lists) is 4
-# end
-
-
-fun report-tolerant-safe(reports-lst :: List<List<Number>>) -> Number:
-  doc: "consumes a list of lists and report the number of tolerant safe reports"
-
-  fun helper(lst-reports :: List<List<Number>>, acc :: Number):
-    cases (List) lst-reports:
-      | empty => acc
-      | link(f, r) => 
-        if is-tolerant-safe(f):
-          helper(r, acc + 1)
-        else:
-          helper(r, acc)
-        end
-    end
-  end
-
-  helper(reports-lst, 0)
-
-
-where:
-  report-tolerant-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]]) is 4
-
+  report-safe(report-lists, is-safe, 0) is 2
+  report-safe(report-lists, is-tolerant-safe, 0) is 4
 end
 
 
-fun report-safe(reports :: List<List<Number>>) -> Number:
-  doc: "consumes a list of reports and return the number of safe reports"
+fun report-safe<T>(report-lists :: List<List<T>>, safe-function :: (T -> Boolean), acc :: T) -> T:
+  doc: "consumes a list of reports, a safe function and accumulator and return the number of safe reports based on the safe function"
 
-  fun helper(lst :: List<List<Number>>, acc :: Number):
-    cases (List) lst:
-      | empty => acc
-      | link(f, r) => 
-        if is-safe(f):
-          helper(r, acc + 1)
-        else:
-          helper(r, acc)
-        end
-    end
+  cases(List) report-lists:
+    | empty => acc
+    | link(f, r) =>
+      if safe-function(f):
+        report-safe(r, safe-function, acc + 1)
+      else:
+        report-safe(r, safe-function, acc)
+      end
   end
-
-  helper(reports, 0)
-
+  
 where:
-  report-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]]) is 2
-
+  report-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]], is-tolerant-safe, 0) is 4
+  
+  report-safe([list: [list:7, 6, 4, 2, 1], [list: 1, 2, 7, 8, 9], [list: 9, 7, 6, 2, 1], [list: 1, 3, 2, 4, 5], [list: 8, 6, 4, 4, 1],[list: 1, 3, 6, 7, 9]], is-safe, 0) is 2
 end
+
 
 
 fun is-tolerant-safe(lst :: List<Number>) -> Boolean:
   doc: "process a list and determine if it is safe. This is a variant of is-safe and tolerate a single bad level"
   
   
+  # Helper function to remove each element once and checking if the resulting list is safe
   fun helper(seen, n-lst):
     cases (List) n-lst:
       | empty => false
