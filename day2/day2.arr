@@ -1,6 +1,6 @@
 use context starter2024
 
-include file("sample-data.arr")
+include file("puzzle-data.arr")
 
 fun process-file(file :: String)-> List<List<Number>>:
   doc: "read file and process the content to produce a list of list of numbers"
@@ -8,13 +8,11 @@ fun process-file(file :: String)-> List<List<Number>>:
 end
 
 
-check:
-  report-lists = process-file(sample-input)
+# check:
+#   report-lists = process-file(sample-input)
   
-  report-safe(report-lists) is 2
-end
-
-
+#   report-safe(report-lists) is 2
+# end
 
 
 fun report-safe(reports :: List<List<Number>>) -> Number:
